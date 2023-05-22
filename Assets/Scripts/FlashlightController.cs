@@ -24,10 +24,5 @@ public class FlashlightController : NetworkBehaviour
     {
         // Rotate the flashlight to match the camera's rotation
         transform.rotation = playerCamera.transform.rotation;
-
-        // Randomly flicker intensity of he flashlight
-        if (Random.Range(0, 25) == 1) {
-            GetComponent<Light>().intensity = Random.Range(1.2f, 1.6f);
-        }
     }
 }
