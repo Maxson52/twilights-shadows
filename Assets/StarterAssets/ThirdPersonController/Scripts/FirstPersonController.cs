@@ -25,6 +25,11 @@ public class FirstPersonController : NetworkBehaviour
     private float cameraYOffset = 0.4f;
     private Camera playerCamera;
 
+    // Audio
+    public AudioClip LandingAudioClip;
+    public AudioClip[] FootstepAudioClips;
+    [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
+
     // Animator
     private Animator _animator;
 
@@ -163,6 +168,29 @@ public class FirstPersonController : NetworkBehaviour
         // if (Input.GetButton("Jump") && canMove && characterController.isGrounded) {
         //     _animator.SetBool(_animIDJump, true);
         // }
+    }
+
+    // Fancy pants audio stuff
+    private void OnFootstep(AnimationEvent animationEvent)
+    {
+        Debug.Log("OnFootstep");
+        if (animationEvent.animatorClipInfo.weight > 0.5f)
+        {
+            if (FootstepAudioClips.Length > 0)
+            {
+                var index = Random.Range(0, FootstepAudioClips.Length);
+                AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
+            }
+        }
+    }
+
+    private void OnLand(AnimationEvent animationEvent)
+    {
+        Debug.Log("OnLand");
+        if (animationEvent.animatorClipInfo.weight > 0.5f)
+        {
+            AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.center), FootstepAudioVolume);
+        }
     }
 
     // Fancy pants animation stuff
