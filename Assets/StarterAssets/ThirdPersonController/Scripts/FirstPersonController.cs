@@ -41,6 +41,9 @@ public class FirstPersonController : NetworkBehaviour
     private int _animIDJump;
     private int _animIDFreeFall;
     private int _animIDMotionSpeed;
+
+    // Pause
+    private PauseController pauseController;
     
     // Methods
     public override void OnStartClient()
@@ -48,9 +51,12 @@ public class FirstPersonController : NetworkBehaviour
         base.OnStartClient();
         if (base.IsOwner)
         {
+
             playerCamera = Camera.main;
             playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z);
             playerCamera.transform.SetParent(transform);
+
+            pauseController = playerCamera.GetComponent<PauseController>();
 
             foreach (Transform child in transform)
             {
@@ -84,28 +90,29 @@ public class FirstPersonController : NetworkBehaviour
         Cursor.visible = false;
     }
  
+    bool isWalking = false;
     void Update()
     {
-        bool isRunning = false;
- 
+        bool isPaused = pauseController != null ? pauseController.isPaused : false;
+
         // Press Left Shift to run
-        isRunning = Input.GetKey(KeyCode.LeftShift);
+        isWalking = Input.GetKey(KeyCode.LeftShift);
  
         // We are grounded, so recalculate move direction based on axis
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
  
-        float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
+        float curSpeedX = canMove ? (isWalking ? walkingSpeed : runningSpeed) * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = canMove ? (isWalking ? walkingSpeed : runningSpeed) * Input.GetAxis("Horizontal") : 0;
         float movementDirectionY = moveDirection.y;
         float speed = 0.0f;
         if (curSpeedX != 0) {
-            speed = Mathf.Lerp(curSpeedX, isRunning ? runningSpeed : walkingSpeed, Time.deltaTime * acceleration);
+            speed = Mathf.Lerp(curSpeedX, isWalking ? walkingSpeed : runningSpeed, Time.deltaTime * acceleration);
             speed = Mathf.Round(speed * 1000f) / 1000f;
         }
         moveDirection = (forward * speed) + (right * curSpeedY);
  
-        if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
+        if (Input.GetButton("Jump") && canMove && characterController.isGrounded && !isPaused)
         {
             moveDirection.y = jumpSpeed;
         }
@@ -123,7 +130,7 @@ public class FirstPersonController : NetworkBehaviour
         characterController.Move(moveDirection * Time.deltaTime);
  
         // Player and Camera rotation
-        if (canMove && playerCamera != null)
+        if (canMove && playerCamera != null && !isPaused)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
@@ -151,7 +158,7 @@ public class FirstPersonController : NetworkBehaviour
 
             // On move
             if (curSpeedX != 0 || curSpeedY != 0) {
-                _animationBlend = Mathf.Lerp(_animationBlend, (isRunning ? runningSpeed : walkingSpeed), Time.deltaTime * acceleration);
+                _animationBlend = Mathf.Lerp(_animationBlend, (isWalking ? walkingSpeed : runningSpeed), Time.deltaTime * acceleration);
                 if (_animationBlend < 0.01f) _animationBlend = 0f;
 
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
@@ -170,10 +177,11 @@ public class FirstPersonController : NetworkBehaviour
         // }
     }
 
-    // Fancy pants audio stuff
     private void OnFootstep(AnimationEvent animationEvent)
     {
         Debug.Log("OnFootstep");
+        if (isWalking) return;
+
         if (animationEvent.animatorClipInfo.weight > 0.5f)
         {
             if (FootstepAudioClips.Length > 0)
@@ -187,10 +195,6 @@ public class FirstPersonController : NetworkBehaviour
     private void OnLand(AnimationEvent animationEvent)
     {
         Debug.Log("OnLand");
-        if (animationEvent.animatorClipInfo.weight > 0.5f)
-        {
-            AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.center), FootstepAudioVolume);
-        }
     }
 
     // Fancy pants animation stuff

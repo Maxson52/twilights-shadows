@@ -16,7 +16,7 @@ public class FlashlightController : NetworkBehaviour
 
             // Set the flashlight to be a child of the camera
             transform.SetParent(playerCamera.transform);
-            transform.localPosition = new Vector3(0, -0.1f, 0.35f);
+            transform.localPosition = new Vector3(0, 0, 0.4f);
         }
     }
 

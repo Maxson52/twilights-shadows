@@ -17,6 +17,20 @@ public class PlayerSelection : NetworkBehaviour
         }
     }
 
+    void Start() {
+        // show cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    void Update() {
+        // show cursor if canvas is active
+        if (canvas.activeSelf) {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
     public void SpawnHider() {
         canvas.SetActive(false);
         Spawn(0, LocalConnection);
