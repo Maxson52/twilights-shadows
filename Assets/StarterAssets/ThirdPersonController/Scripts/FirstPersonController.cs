@@ -91,6 +91,7 @@ public class FirstPersonController : NetworkBehaviour
     }
  
     bool isWalking = false;
+    float timeSinceLastFootstep = 0;
     void Update()
     {
         bool isPaused = pauseController != null ? pauseController.isPaused : false;
@@ -136,6 +137,24 @@ public class FirstPersonController : NetworkBehaviour
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+        }
+
+        if (curSpeedX != 0) {
+            timeSinceLastFootstep += Time.deltaTime;
+        } else {
+            timeSinceLastFootstep = 0;
+        }
+
+        // Play footstep audio when not walking
+        if (!isWalking && characterController.isGrounded && curSpeedX != 0 && !isPaused) {
+            if (timeSinceLastFootstep < 0.42f) return;
+
+            timeSinceLastFootstep = 0;
+            // Only play if there are footstep audio clips
+            if (FootstepAudioClips.Length > 0) {
+                int index = Random.Range(0, FootstepAudioClips.Length);
+                AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
+            }
         }
 
         // On free fall
