@@ -1218,8 +1218,7 @@ MonoBehaviour:
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
-  _networkBehaviours:
-  - {fileID: 1497514998}
+  _networkBehaviours: []
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -1233,7 +1232,6 @@ MonoBehaviour:
   <SceneId>k__BackingField: 4089165068549278408
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
-  - {fileID: 1497514997}
   - {fileID: 1517740343}
 --- !u!114 &1497514998
 MonoBehaviour:
@@ -1247,10 +1245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e224a1d3d891af347b45ef020076b815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 0
-  _addedNetworkObject: {fileID: 1497514997}
-  _networkObjectCache: {fileID: 1497514997}
-  networkManager: {fileID: 2906111576140319057}
+  _replaceScenes: 0
   joinLobby: {fileID: 896268498}
   startServer: {fileID: 547694136}
 --- !u!4 &1497514999
@@ -1348,7 +1343,6 @@ MonoBehaviour:
   <SceneId>k__BackingField: 4089165068271966640
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
-  - {fileID: 1497514997}
   - {fileID: 1517740343}
 --- !u!1 &1537243140
 GameObject:
@@ -1853,8 +1847,8 @@ GameObject:
   - component: {fileID: 2906111576140319057}
   - component: {fileID: 2906111576140319059}
   - component: {fileID: 2906111576140319071}
-  - component: {fileID: 2906111576140319072}
   - component: {fileID: 2906111576140319073}
+  - component: {fileID: 2906111576140319074}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -1878,7 +1872,20 @@ MonoBehaviour:
   port: 1234
   discoveryInterval: 2
   automatic: 0
---- !u!114 &2906111576140319072
+--- !u!114 &2906111576140319073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2906111576140319070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78975ddbd71dc7b409c3d35db55a8429, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkDiscovery: {fileID: 2906111576140319071}
+--- !u!114 &2906111576140319074
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1895,16 +1902,3 @@ MonoBehaviour:
   _offlineScene: Assets/Scenes/Lobby.unity
   _onlineScene: Assets/Scenes/Game.unity
   _replaceScenes: 0
---- !u!114 &2906111576140319073
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2906111576140319070}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78975ddbd71dc7b409c3d35db55a8429, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  networkDiscovery: {fileID: 2906111576140319071}
