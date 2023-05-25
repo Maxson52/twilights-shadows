@@ -25,6 +25,9 @@ public class FirstPersonController : NetworkBehaviour
     private float cameraYOffset = 0.4f;
     private Camera playerCamera;
 
+    [SerializeField]
+    private GameObject cameraTarget;
+
     // Audio
     public AudioClip LandingAudioClip;
     public AudioClip[] FootstepAudioClips;
@@ -53,8 +56,9 @@ public class FirstPersonController : NetworkBehaviour
         {
 
             playerCamera = Camera.main;
-            playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z);
-            playerCamera.transform.SetParent(transform);
+            cameraTarget.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z);
+            playerCamera.transform.position = cameraTarget.transform.position;
+            playerCamera.transform.SetParent(cameraTarget.transform);
 
             pauseController = playerCamera.GetComponent<PauseController>();
 
@@ -135,7 +139,7 @@ public class FirstPersonController : NetworkBehaviour
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
-            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            cameraTarget.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
 
@@ -199,16 +203,6 @@ public class FirstPersonController : NetworkBehaviour
     private void OnFootstep(AnimationEvent animationEvent)
     {
         Debug.Log("OnFootstep");
-        if (isWalking) return;
-
-        if (animationEvent.animatorClipInfo.weight > 0.5f)
-        {
-            if (FootstepAudioClips.Length > 0)
-            {
-                var index = Random.Range(0, FootstepAudioClips.Length);
-                AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
-            }
-        }
     }
 
     private void OnLand(AnimationEvent animationEvent)
