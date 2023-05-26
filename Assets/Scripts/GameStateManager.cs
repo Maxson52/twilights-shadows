@@ -13,8 +13,6 @@ public class GameStateManager : NetworkBehaviour
 
     void Update()
     {
-        // if (!base.IsServer) return;
-
         // Only start if there is at least one object with tag Player and one Seeker
         if (GameObject.FindGameObjectsWithTag("Player").Length > 0 && GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
         {

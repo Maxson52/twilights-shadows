@@ -2161,7 +2161,7 @@ Transform:
   m_GameObject: {fileID: 5088322876150215219}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3010176057950044393}
@@ -2279,15 +2279,15 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: -694808404766254709}
   _networkObjectCache: {fileID: -694808404766254709}
-  walkingSpeed: 2
-  runningSpeed: 4.5
+  walkingSpeed: 5
+  runningSpeed: 12
   acceleration: 4
-  jumpSpeed: 6
-  gravity: 20
+  jumpSpeed: 9
+  gravity: 25
   lookSpeed: 1
   lookXLimit: 70
   canMove: 1
-  cameraYOffset: 1.7
+  cameraYOffset: 3.55
   cameraTarget: {fileID: 5899258004181657582}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips:

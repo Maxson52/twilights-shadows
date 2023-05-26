@@ -8,8 +8,7 @@ public class NightVisionController : NetworkBehaviour
         base.OnStartClient();
         if (base.IsOwner)
         {
-            // Disable environment fog for this player
-            RenderSettings.fog = false;
+            RenderSettings.fogDensity = 0.025f;
         } else {
             gameObject.SetActive(false);
         }
