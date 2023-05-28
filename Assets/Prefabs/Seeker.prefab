@@ -1341,6 +1341,7 @@ GameObject:
   - component: {fileID: 3408942633922101178}
   - component: {fileID: 3117215049979830087}
   - component: {fileID: -2518061654353809036}
+  - component: {fileID: 3276142005766230236}
   m_Layer: 0
   m_Name: Seeker
   m_TagString: Seeker
@@ -1480,8 +1481,8 @@ MonoBehaviour:
   walkingSpeed: 5
   runningSpeed: 12
   acceleration: 4
-  jumpSpeed: 9
-  gravity: 25
+  jumpSpeed: 10
+  gravity: 30
   lookSpeed: 1
   lookXLimit: 70
   canMove: 1
@@ -1633,6 +1634,21 @@ MonoBehaviour:
   _interpolation: 8
   _clientAuthoritative: 1
   _sendToOwner: 0
+--- !u!114 &3276142005766230236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2817051994157138043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []
 --- !u!1 &2823451535089407153
 GameObject:
   m_ObjectHideFlags: 0

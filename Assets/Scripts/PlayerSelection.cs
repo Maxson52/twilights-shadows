@@ -32,13 +32,11 @@ public class PlayerSelection : NetworkBehaviour
     }
 
     public void SpawnHider() {
-        Debug.Log("SpawnHider");
         canvas.SetActive(false);
         Spawn(0, LocalConnection);
     }
 
     public void SpawnSeeker() {
-        Debug.Log("SpawnSeeker");
         canvas.SetActive(false);
         Spawn(1, LocalConnection);
     }

@@ -2145,6 +2145,7 @@ GameObject:
   - component: {fileID: -694808404766254709}
   - component: {fileID: 8959704837120758981}
   - component: {fileID: 6955871836485110657}
+  - component: {fileID: 6318517140118830085}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2282,8 +2283,8 @@ MonoBehaviour:
   walkingSpeed: 5
   runningSpeed: 12
   acceleration: 4
-  jumpSpeed: 9
-  gravity: 25
+  jumpSpeed: 10
+  gravity: 30
   lookSpeed: 1
   lookXLimit: 70
   canMove: 1
@@ -2357,6 +2358,7 @@ MonoBehaviour:
   - {fileID: 8413231791857572662}
   - {fileID: 8959704837120758981}
   - {fileID: 6955871836485110657}
+  - {fileID: 0}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField:
   - {fileID: 8213694544720186979}
@@ -2434,6 +2436,21 @@ MonoBehaviour:
   _interpolation: 8
   _clientAuthoritative: 1
   _sendToOwner: 0
+--- !u!114 &6318517140118830085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5088322876150215219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []
 --- !u!1 &5092569184887400475
 GameObject:
   m_ObjectHideFlags: 0

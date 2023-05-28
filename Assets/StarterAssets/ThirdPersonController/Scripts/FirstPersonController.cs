@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using FishNet.Connection;
 using FishNet.Object;
 
@@ -27,6 +28,8 @@ public class FirstPersonController : NetworkBehaviour
 
     [SerializeField]
     private GameObject cameraTarget;
+
+    private RawImage compass;
 
     // Audio
     public AudioClip LandingAudioClip;
@@ -81,6 +84,9 @@ public class FirstPersonController : NetworkBehaviour
     {
         characterController = GetComponent<CharacterController>();
  
+        // Compass
+        compass = GameObject.Find("Compass").GetComponent<RawImage>();
+
         // Animator
         AssignAnimationIDs();
 
@@ -96,9 +102,16 @@ public class FirstPersonController : NetworkBehaviour
  
     bool isWalking = false;
     float timeSinceLastFootstep = 0;
+    bool wasGrounded = false;
     void Update()
     {
         bool isPaused = pauseController != null ? pauseController.isPaused : false;
+
+        // Compass
+        if (compass != null) {
+            compass.uvRect = new Rect(transform.localEulerAngles.y / 360f, 0, 1, 1);
+        }
+
 
         // Press Left Shift to run
         isWalking = Input.GetKey(KeyCode.LeftShift);
@@ -117,6 +130,7 @@ public class FirstPersonController : NetworkBehaviour
         }
         moveDirection = (forward * speed) + (right * curSpeedY);
  
+        
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded && !isPaused)
         {
             moveDirection.y = jumpSpeed;
@@ -158,8 +172,22 @@ public class FirstPersonController : NetworkBehaviour
             if (FootstepAudioClips.Length > 0) {
                 int index = Random.Range(0, FootstepAudioClips.Length);
                 AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
+                // Emit RPC
+                if (base.IsOwner) {
+                    RpcPlayFootstepAudio(transform.TransformPoint(characterController.center), index);
+                }
             }
         }
+        // Play landing audio when landing
+        if (!wasGrounded && characterController.isGrounded && !isPaused) {
+            AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.center), FootstepAudioVolume);
+            // Emit RPC
+            if (base.IsOwner) {
+                RpcPlayLandingAudio(transform.TransformPoint(characterController.center));
+            }
+        }
+
+        wasGrounded = characterController.isGrounded;
 
         // On free fall
         if (!characterController.isGrounded) {
@@ -218,5 +246,20 @@ public class FirstPersonController : NetworkBehaviour
         _animIDJump = Animator.StringToHash("Jump");
         _animIDFreeFall = Animator.StringToHash("FreeFall");
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
+    }
+
+    // RPCs
+    [ObserversRpc]
+    private void RpcPlayFootstepAudio(Vector3 center, int index)
+    {
+        Debug.Log("RpcPlayFootstepAudio");
+        AudioSource.PlayClipAtPoint(FootstepAudioClips[index], center, FootstepAudioVolume);
+    }
+
+    [ObserversRpc]
+    private void RpcPlayLandingAudio(Vector3 center)
+    {
+        Debug.Log("RpcPlayLandingAudio");
+        AudioSource.PlayClipAtPoint(LandingAudioClip, center, FootstepAudioVolume);
     }
 }
