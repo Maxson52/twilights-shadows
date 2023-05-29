@@ -7,15 +7,32 @@ using FishNet.Object.Synchronizing;
 
 public class GameStateManager : NetworkBehaviour
 {
-    [SyncVar]
-    public float timeRemaining = 30f;
+    [SerializeField]
+    private float timeToStart = 30f;
+    [SerializeField]
+    private float timeToPlay = 300f;
+
+    private float timeRemaining = 0;
     [SerializeField] private TextMeshProUGUI timerText;
     bool gameOn = false;
+
+    void Start()
+    {
+        timeRemaining = timeToStart;
+    }
 
     void Update()
     {       
         if (gameOn) {
-            // Debug.Log("Game is on");
+            if (timeRemaining > 0)
+            {
+                timeRemaining -= Time.deltaTime;
+                timerText.text = "Time remaining: " + Mathf.Round(timeRemaining);
+            }
+            else
+            {
+                timerText.text = "Game over!";
+            }
         }
         else {
             // Only start if there is at least one object with tag Player and one Seeker
@@ -38,6 +55,8 @@ public class GameStateManager : NetworkBehaviour
 
     void StartGame() 
     {
+        timeRemaining = timeToPlay;
+
         // Place players randomly between z = 30 and z = 120 (x is -290 and y = 12)
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {

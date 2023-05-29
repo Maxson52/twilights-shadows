@@ -171,7 +171,7 @@ public class FirstPersonController : NetworkBehaviour
             // Only play if there are footstep audio clips
             if (FootstepAudioClips.Length > 0) {
                 int index = Random.Range(0, FootstepAudioClips.Length);
-                AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
+                // AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
                 // Emit RPC
                 if (base.IsOwner) {
                     RpcPlayFootstepAudio(transform.TransformPoint(characterController.center), index);
@@ -180,7 +180,7 @@ public class FirstPersonController : NetworkBehaviour
         }
         // Play landing audio when landing
         if (!wasGrounded && characterController.isGrounded && !isPaused) {
-            AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.center), FootstepAudioVolume);
+            // AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.center), FootstepAudioVolume);
             // Emit RPC
             if (base.IsOwner) {
                 RpcPlayLandingAudio(transform.TransformPoint(characterController.center));
@@ -248,7 +248,22 @@ public class FirstPersonController : NetworkBehaviour
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
     }
 
-    // RPCs
+    // Server RPCs
+    [ServerRpc]
+    private void ServerPlayFootstepAudio(Vector3 center, int index)
+    {
+        Debug.Log("ServerPlayFootstepAudio");
+        RpcPlayFootstepAudio(center, index);
+    }
+
+    [ServerRpc]
+    private void ServerPlayLandingAudio(Vector3 center)
+    {
+        Debug.Log("ServerPlayLandingAudio");
+        RpcPlayLandingAudio(center);
+    }
+
+    // Observer RPCs
     [ObserversRpc]
     private void RpcPlayFootstepAudio(Vector3 center, int index)
     {
