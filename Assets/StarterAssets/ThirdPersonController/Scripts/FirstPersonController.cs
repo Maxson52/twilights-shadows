@@ -157,23 +157,22 @@ public class FirstPersonController : NetworkBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
 
-        if (curSpeedX != 0) {
+        if (curSpeedX != 0 || curSpeedY != 0) {
             timeSinceLastFootstep += Time.deltaTime;
         } else {
             timeSinceLastFootstep = 0;
         }
 
         // Play footstep audio when not walking
-        if (!isWalking && characterController.isGrounded && curSpeedX != 0 && !isPaused) {
+        if (!isWalking && characterController.isGrounded && (curSpeedX != 0 || curSpeedY != 0) && !isPaused) {
             if (timeSinceLastFootstep < 0.42f) return;
 
             timeSinceLastFootstep = 0;
             // Only play if there are footstep audio clips
             if (FootstepAudioClips.Length > 0) {
-                int index = Random.Range(0, FootstepAudioClips.Length);
-                // AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(characterController.center), FootstepAudioVolume);
                 // Emit RPC
                 if (base.IsOwner) {
+                int index = Random.Range(0, FootstepAudioClips.Length);
                     RpcPlayFootstepAudio(transform.TransformPoint(characterController.center), index);
                 }
             }
@@ -252,14 +251,12 @@ public class FirstPersonController : NetworkBehaviour
     [ServerRpc]
     private void ServerPlayFootstepAudio(Vector3 center, int index)
     {
-        Debug.Log("ServerPlayFootstepAudio");
         RpcPlayFootstepAudio(center, index);
     }
 
     [ServerRpc]
     private void ServerPlayLandingAudio(Vector3 center)
     {
-        Debug.Log("ServerPlayLandingAudio");
         RpcPlayLandingAudio(center);
     }
 
@@ -267,14 +264,15 @@ public class FirstPersonController : NetworkBehaviour
     [ObserversRpc]
     private void RpcPlayFootstepAudio(Vector3 center, int index)
     {
-        Debug.Log("RpcPlayFootstepAudio");
+        Debug.Log("RpcPlayFootstepAudio")
+        if (Vector3.Distance(center, transform.position) > 25) return;
         AudioSource.PlayClipAtPoint(FootstepAudioClips[index], center, FootstepAudioVolume);
     }
 
     [ObserversRpc]
     private void RpcPlayLandingAudio(Vector3 center)
     {
-        Debug.Log("RpcPlayLandingAudio");
+        if (Vector3.Distance(center, transform.position) > 25) return;
         AudioSource.PlayClipAtPoint(LandingAudioClip, center, FootstepAudioVolume);
     }
 }

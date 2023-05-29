@@ -12,6 +12,7 @@ public class GameStateManager : NetworkBehaviour
     [SerializeField]
     private float timeToPlay = 300f;
 
+    [SyncVar]
     private float timeRemaining = 0;
     [SerializeField] private TextMeshProUGUI timerText;
     bool gameOn = false;
