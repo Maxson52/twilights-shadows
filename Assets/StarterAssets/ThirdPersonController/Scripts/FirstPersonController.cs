@@ -120,8 +120,8 @@ public class FirstPersonController : NetworkBehaviour
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
  
-        float curSpeedX = canMove ? (isWalking ? walkingSpeed : runningSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isWalking ? walkingSpeed : runningSpeed) * Input.GetAxis("Horizontal") : 0;
+        float curSpeedX = canMove && !isPaused ? (isWalking ? walkingSpeed : runningSpeed) * Input.GetAxis("Vertical") : 0;
+        float curSpeedY = canMove && !isPaused ? (isWalking ? walkingSpeed : runningSpeed) * Input.GetAxis("Horizontal") : 0;
         float movementDirectionY = moveDirection.y;
         float speed = 0.0f;
         if (curSpeedX != 0) {
@@ -264,7 +264,7 @@ public class FirstPersonController : NetworkBehaviour
     [ObserversRpc]
     private void RpcPlayFootstepAudio(Vector3 center, int index)
     {
-        Debug.Log("RpcPlayFootstepAudio")
+        Debug.Log("RpcPlayFootstepAudio");
         if (Vector3.Distance(center, transform.position) > 25) return;
         AudioSource.PlayClipAtPoint(FootstepAudioClips[index], center, FootstepAudioVolume);
     }
