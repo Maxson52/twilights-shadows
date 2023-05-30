@@ -1065,7 +1065,7 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 1087226788}
   _networkObjectCache: {fileID: 1087226788}
-  timeToStart: 10
+  timeToStart: 30
   timeToPlay: 300
   timeRemaining: 0
   timerText: {fileID: 1807343688}
