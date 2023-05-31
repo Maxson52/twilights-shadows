@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CinemachineTarget
   - Seeker
+  - Key
+  - Terrain
   layers:
   - Default
   - TransparentFX

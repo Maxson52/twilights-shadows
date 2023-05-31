@@ -8,6 +8,9 @@ using FishNet.Object.Synchronizing;
 public class GameStateManager : NetworkBehaviour
 {
     [SerializeField]
+    private GameObject keyPrefab;
+
+    [SerializeField]
     private float timeToStart = 30f;
     [SerializeField]
     private float timeToPlay = 300f;
@@ -16,6 +19,11 @@ public class GameStateManager : NetworkBehaviour
     private float timeRemaining = 0;
     [SerializeField] private TextMeshProUGUI timerText;
     bool gameOn = false;
+
+    [SyncVar]
+    private int keysTotal = 0;
+    [SyncVar]
+    public int keysCollected = 0;
 
     void Start()
     {
@@ -28,7 +36,7 @@ public class GameStateManager : NetworkBehaviour
             if (timeRemaining > 0)
             {
                 timeRemaining -= Time.deltaTime;
-                timerText.text = "Time remaining: " + Mathf.Round(timeRemaining);
+                timerText.text = "Time remaining: " + Mathf.Round(timeRemaining) + "\nKeys collected: " + keysCollected + "/" + (keysTotal / 2);
             }
             else
             {
@@ -57,6 +65,16 @@ public class GameStateManager : NetworkBehaviour
     void StartGame() 
     {
         timeRemaining = timeToPlay;
+
+        keysTotal = GameObject.FindGameObjectsWithTag("Player").Length * 10;
+        keysCollected = 0;
+        
+        // Spawn keys
+        for (int i = 0; i < keysTotal; i++)
+        {
+            GameObject key = Instantiate(keyPrefab);
+            key.transform.position = new Vector3(Random.Range(-376, 455), 12, Random.Range(-162, 286));
+        }
 
         // Place players randomly between z = 30 and z = 120 (x is -290 and y = 12)
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))

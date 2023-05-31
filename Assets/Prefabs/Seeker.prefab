@@ -1336,7 +1336,6 @@ GameObject:
   - component: {fileID: 3673865731808245724}
   - component: {fileID: 2774035132331170394}
   - component: {fileID: 3614570231147466295}
-  - component: {fileID: 6667651611395728064}
   - component: {fileID: 1090429171265512572}
   - component: {fileID: 3408942633922101178}
   - component: {fileID: 3117215049979830087}
@@ -1501,23 +1500,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
   FootstepAudioVolume: 0.5
---- !u!114 &6667651611395728064
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2817051994157138043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 909d917d73a63f940ac158d02e936645, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  canPush: 0
-  strength: 1.1
 --- !u!114 &1090429171265512572
 MonoBehaviour:
   m_ObjectHideFlags: 0
