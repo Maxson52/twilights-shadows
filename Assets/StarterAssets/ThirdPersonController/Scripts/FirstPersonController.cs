@@ -65,6 +65,10 @@ public class FirstPersonController : NetworkBehaviour
 
             pauseController = playerCamera.GetComponent<PauseController>();
 
+            // Compass
+            compass = GameObject.Find("Compass").GetComponent<RawImage>();
+            compass.GetComponent<CompassHandler>().player = gameObject;
+
             foreach (Transform child in transform)
             {
                 // Change the skinned mesh renderer to shadows only 
@@ -83,9 +87,6 @@ public class FirstPersonController : NetworkBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
- 
-        // Compass
-        compass = GameObject.Find("Compass").GetComponent<RawImage>();
 
         // Animator
         AssignAnimationIDs();
@@ -103,15 +104,23 @@ public class FirstPersonController : NetworkBehaviour
     bool isWalking = false;
     float timeSinceLastFootstep = 0;
     bool wasGrounded = false;
+    bool didPressJump = false;
     void Update()
-    {
+    {   
         bool isPaused = pauseController != null ? pauseController.isPaused : false;
 
         // Compass
         if (compass != null) {
             compass.uvRect = new Rect(transform.localEulerAngles.y / 360f, 0, 1, 1);
-        }
 
+            // delete all children if this tag is Seeker
+            if (gameObject.tag == "Seeker") {
+                foreach (Transform child in compass.transform) {
+                    compass.GetComponent<CompassHandler>().RemoveKeyMarker(child.gameObject);
+                    Destroy(child.gameObject);
+                }
+            }
+        }
 
         // Press Left Shift to run
         isWalking = Input.GetKey(KeyCode.LeftShift);
@@ -134,6 +143,7 @@ public class FirstPersonController : NetworkBehaviour
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded && !isPaused)
         {
             moveDirection.y = jumpSpeed;
+            didPressJump = true;
         }
         else
         {
@@ -146,7 +156,7 @@ public class FirstPersonController : NetworkBehaviour
         }
  
         // Move the controller
-        characterController.Move(moveDirection * Time.deltaTime);
+        characterController.Move(moveDirection * Time.deltaTime);       
  
         // Player and Camera rotation
         if (canMove && playerCamera != null && !isPaused)
@@ -178,13 +188,11 @@ public class FirstPersonController : NetworkBehaviour
             }
         }
         // Play landing audio when landing
-        if (!wasGrounded && characterController.isGrounded && !isPaused) {
-            // AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(characterController.center), FootstepAudioVolume);
+        if (!wasGrounded && characterController.isGrounded && didPressJump && !isPaused) {
             // Emit RPC
-            if (base.IsOwner) {
-                RpcPlayLandingAudio(transform.TransformPoint(characterController.center));
-            }
+            RpcPlayLandingAudio(transform.TransformPoint(characterController.center));
         }
+        if (characterController.isGrounded) didPressJump = false;
 
         wasGrounded = characterController.isGrounded;
 
@@ -248,21 +256,22 @@ public class FirstPersonController : NetworkBehaviour
     }
 
     // Server RPCs
-    [ServerRpc]
-    private void ServerPlayFootstepAudio(Vector3 center, int index)
+    [ServerRpc(RequireOwnership = false)]
+    public void ServerPlayFootstepAudio(Vector3 center, int index)
     {
+        Debug.Log("ServerPlayFootstepAudio");
         RpcPlayFootstepAudio(center, index);
     }
 
     [ServerRpc]
-    private void ServerPlayLandingAudio(Vector3 center)
+    public void ServerPlayLandingAudio(Vector3 center)
     {
         RpcPlayLandingAudio(center);
     }
 
     // Observer RPCs
     [ObserversRpc]
-    private void RpcPlayFootstepAudio(Vector3 center, int index)
+    public void RpcPlayFootstepAudio(Vector3 center, int index)
     {
         Debug.Log("RpcPlayFootstepAudio");
         if (Vector3.Distance(center, transform.position) > 25) return;
@@ -270,7 +279,7 @@ public class FirstPersonController : NetworkBehaviour
     }
 
     [ObserversRpc]
-    private void RpcPlayLandingAudio(Vector3 center)
+    public void RpcPlayLandingAudio(Vector3 center)
     {
         if (Vector3.Distance(center, transform.position) > 25) return;
         AudioSource.PlayClipAtPoint(LandingAudioClip, center, FootstepAudioVolume);

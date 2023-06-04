@@ -1337,6 +1337,7 @@ GameObject:
   - component: {fileID: 2774035132331170394}
   - component: {fileID: 3614570231147466295}
   - component: {fileID: 1090429171265512572}
+  - component: {fileID: 5673202153972068140}
   - component: {fileID: 3408942633922101178}
   - component: {fileID: 3117215049979830087}
   - component: {fileID: -2518061654353809036}
@@ -1519,6 +1520,22 @@ MonoBehaviour:
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
+--- !u!114 &5673202153972068140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2817051994157138043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aeb8bf5a8fb30064d890885f0a71a993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 3408942633922101178}
+  _networkObjectCache: {fileID: 0}
+  booSfx: {fileID: 8300000, guid: 351fe74ac7bb2ed4a962cab0f293130e, type: 3}
 --- !u!114 &3408942633922101178
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,6 +10,11 @@ public class GameStateManager : NetworkBehaviour
     [SerializeField]
     private GameObject keyPrefab;
 
+    [Header("Audio")]
+    public AudioClip lobbyMusic;
+    public AudioClip gameMusic;
+
+    [Header("Timing")]
     [SerializeField]
     private float timeToStart = 30f;
     [SerializeField]
@@ -17,46 +22,87 @@ public class GameStateManager : NetworkBehaviour
 
     [SyncVar]
     private float timeRemaining = 0;
-    [SerializeField] private TextMeshProUGUI timerText;
-    bool gameOn = false;
+    [SyncVar]
+    public string timerText = "Loading...";
+    [SerializeField]
+    private TextMeshProUGUI timerTextMesh;
+    [SyncVar]
+    public bool gameOn = false;
+    public string winText = "";
 
     [SyncVar]
     private int keysTotal = 0;
     [SyncVar]
     public int keysCollected = 0;
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        if (!IsServer)
+        {
+            enabled = false;
+        }
+    }
+
     void Start()
     {
         timeRemaining = timeToStart;
+
+        // change BG music to lobby music
+        GameObject.Find("BG Music").GetComponent<AudioSource>().clip = lobbyMusic;
+        GameObject.Find("BG Music").GetComponent<AudioSource>().Play();
     }
 
     void Update()
     {       
+        timerTextMesh.text = timerText;
+
         if (gameOn) {
             if (timeRemaining > 0)
             {
+                bool hiderWin = HiderWin();
+                if (hiderWin) {
+                    winText = "Hiders win!";
+                    gameOn = false;
+                }
+
+                int requiredKeys = keysTotal / 2;
+                
                 timeRemaining -= Time.deltaTime;
-                timerText.text = "Time remaining: " + Mathf.Round(timeRemaining) + "\nKeys collected: " + keysCollected + "/" + (keysTotal / 2);
+
+                if (keysCollected >= requiredKeys)
+                {
+                    timerText = "Time remaining: " + Mathf.Round(timeRemaining) + "\nAll keys collected, report to the building.";
+                } else {
+                    timerText = "Time remaining: " + Mathf.Round(timeRemaining) + "\nKeys collected: " + keysCollected + "/" + requiredKeys;
+                }
             }
             else
             {
-                timerText.text = "Game over!";
+                timerText = "Time's up! Seekers win.";
             }
         }
         else {
-            // Only start if there is at least one object with tag Player and one Seeker
-            if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
-            {
-                if (timeRemaining > 0)
+            if (winText != "") {
+                timerText = winText;
+            } else {
+                // Only start if there is at least one object with tag Player and one Seeker
+                if (GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
                 {
-                    timeRemaining -= Time.deltaTime;
-                    timerText.text = "Starting in: " + Mathf.Round(timeRemaining);
-                }
-                else
-                {
-                    timerText.text = "Starting now...";
-                    StartGame();
-                    gameOn = true;
+                    if (timeRemaining > 0)
+                    {
+                        timeRemaining -= Time.deltaTime;
+                        timerText = "Starting in: " + Mathf.Round(timeRemaining);
+                    }
+                    else
+                    {
+                        timerText = "Starting now...";
+                        StartGame();
+                        gameOn = true;
+                    }
+                } else {
+                    timerText = "Waiting for players...";
                 }
             }
         }
@@ -68,12 +114,18 @@ public class GameStateManager : NetworkBehaviour
 
         keysTotal = GameObject.FindGameObjectsWithTag("Player").Length * 10;
         keysCollected = 0;
+
+        // change BG music to clockmusic
+        GameObject.Find("BG Music").GetComponent<AudioSource>().clip = gameMusic;
+        GameObject.Find("BG Music").GetComponent<AudioSource>().Play();
         
         // Spawn keys
         for (int i = 0; i < keysTotal; i++)
         {
             GameObject key = Instantiate(keyPrefab);
             key.transform.position = new Vector3(Random.Range(-376, 455), 12, Random.Range(-162, 286));
+            GameObject.Find("Compass").GetComponent<CompassHandler>().AddKeyMarker(key.GetComponent<KeyMarker>());
+
         }
 
         // Place players randomly between z = 30 and z = 120 (x is -290 and y = 12)
@@ -95,5 +147,18 @@ public class GameStateManager : NetworkBehaviour
             // facing the -x direction
             seeker.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
+    }
+
+    bool HiderWin() {
+        if (keysCollected >= keysTotal / 2) {
+            foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (player.transform.position.x > -10.3 && player.transform.position.x < 20.6 && player.transform.position.z > 23 && player.transform.position.z < 63.8) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

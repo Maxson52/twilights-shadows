@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class KeyController : MonoBehaviour
 {
+    public AudioClip KeyCollectAudioClip;
+
     void Update()
     {
         transform.Rotate(new Vector3(0, 45, 0) * Time.deltaTime);
@@ -16,6 +18,11 @@ public class KeyController : MonoBehaviour
             Debug.Log("Key collected!");
 
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().keysCollected++;
+
+            AudioSource.PlayClipAtPoint(KeyCollectAudioClip, transform.position);
+
+            // Remove from compass UI
+            GameObject.Find("Compass").GetComponent<CompassHandler>().RemoveKeyMarker(gameObject);
 
             Destroy(gameObject);
         } else if (other.gameObject.CompareTag("Terrain")) 

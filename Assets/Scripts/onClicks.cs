@@ -19,25 +19,24 @@ namespace FishNet.Discovery
         {
             if (networkDiscovery == null) networkDiscovery = FindObjectOfType<NetworkDiscovery>();
 
-            // networkDiscovery.ServerFoundCallback += (endPoint) =>
-            // {
-            //     Debug.Log("Server found!");
+            networkDiscovery.ServerFoundCallback += (endPoint) =>
+            {
+                Debug.Log("Server found!");
 
-            //     string ipAddress = endPoint.Address.ToString();
-            //     InstanceFinder.ClientManager.StartConnection(ipAddress);
+                string ipAddress = endPoint.Address.ToString();
+                InstanceFinder.ClientManager.StartConnection(ipAddress);
 
-            //     // Stop searching for servers
-            //     networkDiscovery.StopSearchingForServers();
-            // };
+                // Stop searching for servers
+                networkDiscovery.StopSearchingForServers();
+            };
         }
 
         public void StartServer() {
             InstanceFinder.ServerManager.StartConnection();
             FindObjectOfType<NetworkDiscovery>().StartAdvertisingServer();
-        }
 
-        public void StartAdvertising() {
-            FindObjectOfType<NetworkDiscovery>().StartAdvertisingServer();
+            // Enable NetworkDiscoveryHUD
+            GameObject.Find("NetworkManager").GetComponent<NetworkDiscoveryHUD>().enabled = true;
         }
 
         public void StartSearching() {

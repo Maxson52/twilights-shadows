@@ -8,6 +8,8 @@ TagManager:
   - Seeker
   - Key
   - Terrain
+  - Compass
+  - Flashlight
   layers:
   - Default
   - TransparentFX
