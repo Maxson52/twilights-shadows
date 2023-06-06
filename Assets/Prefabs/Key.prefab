@@ -48,6 +48,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 712c4ecf879cd4747834cfff510e5a2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   KeyCollectAudioClip: {fileID: 8300000, guid: 58bdbdcca2273cf4c9a0ed5fd5ae4bd5, type: 3}
 --- !u!54 &8871373038534198166
 Rigidbody:

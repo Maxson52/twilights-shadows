@@ -18,10 +18,11 @@ public class GameStateManager : NetworkBehaviour
     [SerializeField]
     private float timeToStart = 30f;
     [SerializeField]
-    private float timeToPlay = 300f;
+    private float timeToPlay = 200f;
 
     [SyncVar]
     private float timeRemaining = 0;
+    private float timeRemainingUntilDisconnect = 5f;
     [SyncVar]
     public string timerText = "Loading...";
     [SerializeField]
@@ -80,15 +81,22 @@ public class GameStateManager : NetworkBehaviour
             }
             else
             {
-                timerText = "Time's up! Seekers win.";
+                winText = "Time's up! Seekers win.";
+                gameOn = false;
             }
         }
         else {
             if (winText != "") {
                 timerText = winText;
+                timeRemainingUntilDisconnect -= Time.deltaTime;
+                if (timeRemainingUntilDisconnect <= 0) {
+                    Debug.Log("Disconnecting...");
+                    Disconnect();
+                }
+
             } else {
                 // Only start if there is at least one object with tag Player and one Seeker
-                if (GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
+                if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
                 {
                     if (timeRemaining > 0)
                     {
@@ -160,5 +168,26 @@ public class GameStateManager : NetworkBehaviour
         }
 
         return false;
+    }
+
+    [ObserversRpc]
+    public void Disconnect() {
+        GameObject.Find("Main Camera").transform.parent = null;
+        ClientManager.StopConnection();
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void KeyCollected() {
+        keysCollected++;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void PlaceSeeker(GameObject seeker)
+    {
+        Debug.Log("Placing seeker");
+        seeker.GetComponent<CharacterController>().enabled = false;
+        seeker.transform.position = new Vector3(Random.Range(-290, 470), 12, Random.Range(30, 120));
+        seeker.GetComponent<CharacterController>().enabled = true;
     }
 }

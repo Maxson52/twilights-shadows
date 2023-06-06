@@ -10,6 +10,7 @@ TagManager:
   - Terrain
   - Compass
   - Flashlight
+  - Light Beam
   layers:
   - Default
   - TransparentFX

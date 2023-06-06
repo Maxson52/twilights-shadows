@@ -15,9 +15,8 @@ public class KeyController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Key collected!");
-
-            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().keysCollected++;
+            // Add key function
+            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().KeyCollected();
 
             AudioSource.PlayClipAtPoint(KeyCollectAudioClip, transform.position);
 

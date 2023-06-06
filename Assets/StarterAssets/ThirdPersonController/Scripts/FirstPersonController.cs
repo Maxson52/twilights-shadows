@@ -96,6 +96,10 @@ public class FirstPersonController : NetworkBehaviour
         }
         _animator.fireEvents = false;
 
+        if (gameObject.tag == "Player") {
+            GameObject.Find("Text").transform.position = new Vector3(556, 56, 0);
+        }
+
         // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -183,14 +187,14 @@ public class FirstPersonController : NetworkBehaviour
                 // Emit RPC
                 if (base.IsOwner) {
                 int index = Random.Range(0, FootstepAudioClips.Length);
-                    RpcPlayFootstepAudio(transform.TransformPoint(characterController.center), index);
+                    ServerPlayFootstepAudio(transform.TransformPoint(characterController.center), index);
                 }
             }
         }
         // Play landing audio when landing
         if (!wasGrounded && characterController.isGrounded && didPressJump && !isPaused) {
             // Emit RPC
-            RpcPlayLandingAudio(transform.TransformPoint(characterController.center));
+            ServerPlayLandingAudio(transform.TransformPoint(characterController.center));
         }
         if (characterController.isGrounded) didPressJump = false;
 
@@ -256,10 +260,10 @@ public class FirstPersonController : NetworkBehaviour
     }
 
     // Server RPCs
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc]
     public void ServerPlayFootstepAudio(Vector3 center, int index)
     {
-        Debug.Log("ServerPlayFootstepAudio");
+        // Debug.Log("ServerPlayFootstepAudio");
         RpcPlayFootstepAudio(center, index);
     }
 
@@ -273,7 +277,7 @@ public class FirstPersonController : NetworkBehaviour
     [ObserversRpc]
     public void RpcPlayFootstepAudio(Vector3 center, int index)
     {
-        Debug.Log("RpcPlayFootstepAudio");
+        // Debug.Log("RpcPlayFootstepAudio");
         if (Vector3.Distance(center, transform.position) > 25) return;
         AudioSource.PlayClipAtPoint(FootstepAudioClips[index], center, FootstepAudioVolume);
     }
