@@ -1068,8 +1068,8 @@ MonoBehaviour:
   keyPrefab: {fileID: 797488518202339941, guid: 815cad7a423b3be45a012b3262419442, type: 3}
   lobbyMusic: {fileID: 8300000, guid: 1f96df0b0a6594d4ca8c63775be4527b, type: 3}
   gameMusic: {fileID: 8300000, guid: eada1f88cb419634cb065ce64d6140c1, type: 3}
-  timeToStart: 5
-  timeToPlay: 5
+  timeToStart: 10
+  timeToPlay: 220
   timeRemaining: 0
   timerText: 
   timerTextMesh: {fileID: 1807343688}

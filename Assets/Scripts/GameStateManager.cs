@@ -64,8 +64,7 @@ public class GameStateManager : NetworkBehaviour
             {
                 bool hiderWin = HiderWin();
                 if (hiderWin) {
-                    winText = "Hiders win!";
-                    gameOn = false;
+                    ServerHiderWin();
                 }
 
                 int requiredKeys = keysTotal / 2;
@@ -189,5 +188,17 @@ public class GameStateManager : NetworkBehaviour
         seeker.GetComponent<CharacterController>().enabled = false;
         seeker.transform.position = new Vector3(Random.Range(-290, 470), 12, Random.Range(30, 120));
         seeker.GetComponent<CharacterController>().enabled = true;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ServerTurnOffFlashlight() {
+        gameOn = false;
+        winText = "Seekers win!";
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ServerHiderWin() {
+        gameOn = false;
+        winText = "Hiders win!";
     }
 }

@@ -97,7 +97,7 @@ public class FirstPersonController : NetworkBehaviour
         _animator.fireEvents = false;
 
         if (gameObject.tag == "Player") {
-            GameObject.Find("Text").transform.position = new Vector3(556, 56, 0);
+            GameObject.Find("Text").GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 56);
         }
 
         // Lock cursor

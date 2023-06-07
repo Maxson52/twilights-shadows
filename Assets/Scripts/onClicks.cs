@@ -17,6 +17,10 @@ namespace FishNet.Discovery
 
         private void Start()
         {
+            // show cursor
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+
             if (networkDiscovery == null) networkDiscovery = FindObjectOfType<NetworkDiscovery>();
 
             networkDiscovery.ServerFoundCallback += (endPoint) =>

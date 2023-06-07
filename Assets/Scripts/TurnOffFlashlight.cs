@@ -8,7 +8,7 @@ public class TurnOffFlashlight : NetworkBehaviour
 {
     public AudioClip booSfx;
 
-    private float timeToTurnOff = 3f;
+    private float timeToTurnOff = 2f;
 
     void Update()
     {
@@ -17,10 +17,11 @@ public class TurnOffFlashlight : NetworkBehaviour
                 timeToTurnOff -= Time.deltaTime;
                 if (timeToTurnOff < 0 && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
                     ServerTurnOffFlashlight();
+                    GameObject.Find("GameStateManager").GetComponent<GameStateManager>().ServerTurnOffFlashlight();
                     timeToTurnOff = 60f;
                 }
             } else {
-                timeToTurnOff = 3f;
+                timeToTurnOff = 2f;
             }
         }
     }
@@ -36,9 +37,6 @@ public class TurnOffFlashlight : NetworkBehaviour
         GameObject.Find("BG Music").GetComponent<AudioSource>().clip = booSfx;
         GameObject.Find("BG Music").GetComponent<AudioSource>().loop = false;
         GameObject.Find("BG Music").GetComponent<AudioSource>().Play();
-
-        GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn = false;
-        GameObject.Find("GameStateManager").GetComponent<GameStateManager>().winText = "Seekers win!";
 
         // turn off flashlight
         foreach (GameObject flashlight in GameObject.FindGameObjectsWithTag("Flashlight")) {
