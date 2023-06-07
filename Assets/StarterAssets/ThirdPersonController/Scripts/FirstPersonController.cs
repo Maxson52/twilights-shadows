@@ -117,11 +117,17 @@ public class FirstPersonController : NetworkBehaviour
         if (compass != null) {
             compass.uvRect = new Rect(transform.localEulerAngles.y / 360f, 0, 1, 1);
 
-            // delete all children if this tag is Seeker
             if (gameObject.tag == "Seeker") {
-                foreach (Transform child in compass.transform) {
-                    compass.GetComponent<CompassHandler>().RemoveKeyMarker(child.gameObject);
-                    Destroy(child.gameObject);
+                // Get rid of the keys
+                GameObject[] keys = GameObject.FindGameObjectsWithTag("Key");
+                foreach (GameObject key in keys) {
+                    compass.GetComponent<CompassHandler>().RemoveMarker(key);
+                }
+            } else if (gameObject.tag == "Player") {
+                // Get rid of marker of players
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+                foreach (GameObject player in players) {
+                    compass.GetComponent<CompassHandler>().RemoveMarker(player);
                 }
             }
         }

@@ -17,7 +17,7 @@ public class TurnOffFlashlight : NetworkBehaviour
                 timeToTurnOff -= Time.deltaTime;
                 if (timeToTurnOff < 0 && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
                     ServerTurnOffFlashlight();
-                    GameObject.Find("GameStateManager").GetComponent<GameStateManager>().ServerTurnOffFlashlight();
+                    GameObject.Find("GameStateManager").GetComponent<GameStateManager>().Winner("Seekers win!");
                     timeToTurnOff = 60f;
                 }
             } else {

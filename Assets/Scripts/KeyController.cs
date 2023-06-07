@@ -21,7 +21,7 @@ public class KeyController : MonoBehaviour
             AudioSource.PlayClipAtPoint(KeyCollectAudioClip, transform.position);
 
             // Remove from compass UI
-            GameObject.Find("Compass").GetComponent<CompassHandler>().RemoveKeyMarker(gameObject);
+            GameObject.Find("Compass").GetComponent<CompassHandler>().RemoveMarker(gameObject);
 
             Destroy(gameObject);
         } else if (other.gameObject.CompareTag("Terrain")) 

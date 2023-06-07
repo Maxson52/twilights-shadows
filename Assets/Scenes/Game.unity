@@ -1069,7 +1069,7 @@ MonoBehaviour:
   lobbyMusic: {fileID: 8300000, guid: 1f96df0b0a6594d4ca8c63775be4527b, type: 3}
   gameMusic: {fileID: 8300000, guid: eada1f88cb419634cb065ce64d6140c1, type: 3}
   timeToStart: 10
-  timeToPlay: 220
+  timeToPlay: 250
   timeRemaining: 0
   timerText: 
   timerTextMesh: {fileID: 1807343688}
@@ -1276,7 +1276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  keyMarkerPrefab: {fileID: 3057463794449821748, guid: 3656d92e2c32d12489f9116a9fc481ad, type: 3}
+  iconPrefab: {fileID: 844637537367613466, guid: 54d496dad28e5ae4698f7a5648c3260b, type: 3}
 --- !u!1 &1329821681
 GameObject:
   m_ObjectHideFlags: 0
@@ -1832,6 +1832,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807343686}
   m_CullTransparentMesh: 1
+--- !u!1 &1973508973 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 19e3bec5d2084834e86823c680ab9eb1, type: 3}
+  m_PrefabInstance: {fileID: 1778977061}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1973508975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973508973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d5195117c75f0b4c8d5e0006c890bf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: aa01bec0dccf7ab44908e00022553a60, type: 3}
+  image: {fileID: 0}
+  category: 2
 --- !u!1001 &1979352518
 PrefabInstance:
   m_ObjectHideFlags: 0

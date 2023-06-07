@@ -7,8 +7,9 @@ public class CompassHandler : MonoBehaviour
 {    
     public GameObject player;
 
-    public GameObject keyMarkerPrefab;
-    List<KeyMarker> keyMarkers = new List<KeyMarker>();
+    public GameObject iconPrefab;
+
+    List<CompassMarker> markers = new List<CompassMarker>();
     
     float compassUnit;
 
@@ -17,37 +18,33 @@ public class CompassHandler : MonoBehaviour
     }
 
     void Update() {
-        foreach (KeyMarker keyMarker in keyMarkers) {
-            if (keyMarker == null || keyMarker.image == null || keyMarker.image.rectTransform == null || player == null) {
+        foreach (CompassMarker marker in markers) {
+            if (marker == null || marker.image == null || marker.image.rectTransform == null || player == null) {
                 continue;
             }
-            keyMarker.image.rectTransform.anchoredPosition = GetPositionOnCompass(keyMarker);
+            marker.image.rectTransform.anchoredPosition = GetPositionOnCompass(marker);
         }
     }
 
-    public void AddKeyMarker(KeyMarker keyMarker) {
-        GameObject newKeyMarker = Instantiate(keyMarkerPrefab, gameObject.GetComponent<RawImage>().transform);
-        keyMarker.image = newKeyMarker.GetComponent<Image>();
-        keyMarker.image.sprite = keyMarker.icon;
+    public void AddMarker(CompassMarker marker) {
+        GameObject newMarker = Instantiate(iconPrefab, gameObject.GetComponent<RawImage>().transform);
+        marker.image = newMarker.GetComponent<Image>();
+        marker.image.sprite = marker.icon;
 
-        keyMarkers.Add(keyMarker);
+        markers.Add(marker);
     }
 
-    public void RemoveKeyMarker(GameObject key) {
-        foreach (KeyMarker keyMarker in keyMarkers) {
-            if (keyMarker == key.GetComponent<KeyMarker>()) {
-                keyMarkers.Remove(keyMarker);
-                Destroy(keyMarker.image.gameObject);
-                break;
-            }
-        }
+    public void RemoveMarker(GameObject markerObject) {
+        CompassMarker marker = markerObject.GetComponent<CompassMarker>();
+        if (marker == null || marker.image == null) return;
+        marker.image.enabled = false;
     }
 
-    Vector2 GetPositionOnCompass(KeyMarker keyMarker) {
+    Vector2 GetPositionOnCompass(CompassMarker marker) {
         Vector2 playerPosition = new Vector2(player.transform.position.x, player.transform.position.z);
         Vector2 playerForward = new Vector2(player.transform.forward.x, player.transform.forward.z);
 
-        float angle = Vector2.SignedAngle(keyMarker.keyPosition - playerPosition, playerForward);
+        float angle = Vector2.SignedAngle(marker.position - playerPosition, playerForward);
 
         return new Vector2(angle * compassUnit, 0f);
     }

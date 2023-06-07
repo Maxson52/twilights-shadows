@@ -60,11 +60,10 @@ public class GameStateManager : NetworkBehaviour
         timerTextMesh.text = timerText;
 
         if (gameOn) {
-            if (timeRemaining > 0)
-            {
+            if (timeRemaining > 0) {
                 bool hiderWin = HiderWin();
                 if (hiderWin) {
-                    ServerHiderWin();
+                    Winner("Hiders win!");
                 }
 
                 int requiredKeys = keysTotal / 2;
@@ -78,10 +77,10 @@ public class GameStateManager : NetworkBehaviour
                     timerText = "Time remaining: " + Mathf.Round(timeRemaining) + "\nKeys collected: " + keysCollected + "/" + requiredKeys;
                 }
             }
-            else
-            {
-                winText = "Time's up! Seekers win.";
-                gameOn = false;
+            else {
+                Debug.Log("GAME OVER? " + timeRemaining);
+
+                Winner("Time's Up. Seekers win!");
             }
         }
         else {
@@ -95,7 +94,7 @@ public class GameStateManager : NetworkBehaviour
 
             } else {
                 // Only start if there is at least one object with tag Player and one Seeker
-                if (GameObject.FindGameObjectsWithTag("Player").Length > 0)
+                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 || GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
                 {
                     if (timeRemaining > 0)
                     {
@@ -106,7 +105,6 @@ public class GameStateManager : NetworkBehaviour
                     {
                         timerText = "Starting now...";
                         StartGame();
-                        gameOn = true;
                     }
                 } else {
                     timerText = "Waiting for players...";
@@ -131,9 +129,18 @@ public class GameStateManager : NetworkBehaviour
         {
             GameObject key = Instantiate(keyPrefab);
             key.transform.position = new Vector3(Random.Range(-376, 455), 12, Random.Range(-162, 286));
-            GameObject.Find("Compass").GetComponent<CompassHandler>().AddKeyMarker(key.GetComponent<KeyMarker>());
-
+            GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(key.GetComponent<CompassMarker>());
         }
+
+        // Add a compass marker for each player
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(player.GetComponent<CompassMarker>());
+        }
+
+        // Add a compass marker for the building
+        GameObject building = GameObject.Find("Building");
+        GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(building.GetComponent<CompassMarker>());
 
         // Place players randomly between z = 30 and z = 120 (x is -290 and y = 12)
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
@@ -154,6 +161,8 @@ public class GameStateManager : NetworkBehaviour
             // facing the -x direction
             seeker.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
+
+        gameOn = true;
     }
 
     bool HiderWin() {
@@ -190,15 +199,10 @@ public class GameStateManager : NetworkBehaviour
         seeker.GetComponent<CharacterController>().enabled = true;
     }
 
+    // WINNER
     [ServerRpc(RequireOwnership = false)]
-    public void ServerTurnOffFlashlight() {
+    public void Winner(string winText) {
         gameOn = false;
-        winText = "Seekers win!";
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    public void ServerHiderWin() {
-        gameOn = false;
-        winText = "Hiders win!";
+        this.winText = winText;
     }
 }
