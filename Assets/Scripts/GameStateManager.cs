@@ -29,6 +29,7 @@ public class GameStateManager : NetworkBehaviour
     private TextMeshProUGUI timerTextMesh;
     [SyncVar]
     public bool gameOn = false;
+    [SyncVar]
     public string winText = "";
 
     [SyncVar]
@@ -78,8 +79,6 @@ public class GameStateManager : NetworkBehaviour
                 }
             }
             else {
-                Debug.Log("GAME OVER? " + timeRemaining);
-
                 Winner("Time's Up. Seekers win!");
             }
         }
@@ -94,7 +93,7 @@ public class GameStateManager : NetworkBehaviour
 
             } else {
                 // Only start if there is at least one object with tag Player and one Seeker
-                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 || GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
+                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 && GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
                 {
                     if (timeRemaining > 0)
                     {

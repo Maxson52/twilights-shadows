@@ -7,21 +7,32 @@ using FishNet.Object;
 public class TurnOffFlashlight : NetworkBehaviour
 {
     public AudioClip booSfx;
+    public AudioClip shhSfx;
 
     private float timeToTurnOff = 2f;
+
+    private bool haveShhed = false;
 
     void Update()
     {
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player")) {
-            if (Vector3.Distance(transform.position, player.transform.position) < 2f) {
+            if (Vector3.Distance(transform.position, player.transform.position) < 2f && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
+                // play shhh audio
+                if (!haveShhed) {
+                    AudioSource.PlayClipAtPoint(shhSfx, transform.position);                            
+                    haveShhed = true;
+                }
+
                 timeToTurnOff -= Time.deltaTime;
-                if (timeToTurnOff < 0 && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
+
+                if (timeToTurnOff < 0) {
                     ServerTurnOffFlashlight();
                     GameObject.Find("GameStateManager").GetComponent<GameStateManager>().Winner("Seekers win!");
                     timeToTurnOff = 60f;
                 }
             } else {
                 timeToTurnOff = 2f;
+                haveShhed = false;
             }
         }
     }

@@ -34,6 +34,12 @@ public class CompassHandler : MonoBehaviour
         markers.Add(marker);
     }
 
+    public void ShowMarker(GameObject markerObject) {
+        CompassMarker marker = markerObject.GetComponent<CompassMarker>();
+        if (marker == null || marker.image == null) return;
+        marker.image.enabled = true;
+    }
+
     public void RemoveMarker(GameObject markerObject) {
         CompassMarker marker = markerObject.GetComponent<CompassMarker>();
         if (marker == null || marker.image == null) return;

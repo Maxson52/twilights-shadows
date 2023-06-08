@@ -36,6 +36,8 @@ public class FirstPersonController : NetworkBehaviour
     public AudioClip[] FootstepAudioClips;
     [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
+    public AudioClip RadarAudioClip;
+
     // Animator
     private Animator _animator;
 
@@ -123,6 +125,24 @@ public class FirstPersonController : NetworkBehaviour
                 foreach (GameObject key in keys) {
                     compass.GetComponent<CompassHandler>().RemoveMarker(key);
                 }
+
+                // Show all player markers every 10 seconds for 1 second
+                GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+                if (Time.time % 7 < 1 && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
+                    foreach (GameObject player in players) {
+                        compass.GetComponent<CompassHandler>().ShowMarker(player);
+                        // make radar sound
+                        if (Time.time % 7 < 0.1) {
+                            AudioSource.PlayClipAtPoint(RadarAudioClip, player.transform.position);                            
+                        }
+                    }
+                } else {
+                    foreach (GameObject player in players) {
+                        compass.GetComponent<CompassHandler>().RemoveMarker(player);
+                    }
+                }
+                
             } else if (gameObject.tag == "Player") {
                 // Get rid of marker of players
                 GameObject[] players = GameObject.FindGameObjectsWithTag("Player");

@@ -1501,6 +1501,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
   FootstepAudioVolume: 0.5
+  RadarAudioClip: {fileID: 8300000, guid: 27f30df884afe08479e8bd575660bd9e, type: 3}
 --- !u!114 &1090429171265512572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1536,6 +1537,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 3408942633922101178}
   _networkObjectCache: {fileID: 3408942633922101178}
   booSfx: {fileID: 8300000, guid: 351fe74ac7bb2ed4a962cab0f293130e, type: 3}
+  shhSfx: {fileID: 8300000, guid: 7588d7228849543498ef2c7dcc212884, type: 3}
 --- !u!114 &3408942633922101178
 MonoBehaviour:
   m_ObjectHideFlags: 0
