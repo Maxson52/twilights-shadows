@@ -265,6 +265,18 @@ public class FirstPersonController : NetworkBehaviour
         // }
     }
 
+    void FixedUpdate() {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 0.5f);
+
+        if (hitColliders.Length > 0) {
+            foreach (Collider c in hitColliders) {
+                if (c.gameObject.tag == "Barrier") {
+                    c.gameObject.GetComponent<MeshCollider>().enabled = true;
+                }
+            }
+        }
+    }
+
     private void OnFootstep(AnimationEvent animationEvent)
     {
         Debug.Log("OnFootstep");
