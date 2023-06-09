@@ -27,6 +27,8 @@ public class FlashlightColliderController : NetworkBehaviour
         {   
             Debug.Log("Seeker entered flashlight collider");
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlaceSeeker(other.gameObject);
+
+            // PLAY AUDIO TODO
         }
     }
 }

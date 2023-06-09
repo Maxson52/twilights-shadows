@@ -266,15 +266,21 @@ public class FirstPersonController : NetworkBehaviour
     }
 
     void FixedUpdate() {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 0.5f);
+        GameObject[] barriers = GameObject.FindGameObjectsWithTag("Barrier");
+        foreach (GameObject barrier in barriers)
+        {
+            barrier.GetComponent<MeshRenderer>().enabled = false;
+        }
 
-        if (hitColliders.Length > 0) {
-            foreach (Collider c in hitColliders) {
-                if (c.gameObject.tag == "Barrier") {
-                    c.gameObject.GetComponent<MeshCollider>().enabled = true;
-                }
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 25);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.CompareTag("Barrier"))
+            {
+                collider.GetComponent<MeshRenderer>().enabled = true;
             }
         }
+
     }
 
     private void OnFootstep(AnimationEvent animationEvent)

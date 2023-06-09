@@ -9,6 +9,8 @@ public class GameStateManager : NetworkBehaviour
 {
     [SerializeField]
     private GameObject keyPrefab;
+    [SerializeField]
+    private GameObject powerUpPrefab;
 
     [Header("Audio")]
     public AudioClip lobbyMusic;
@@ -93,7 +95,7 @@ public class GameStateManager : NetworkBehaviour
 
             } else {
                 // Only start if there is at least one object with tag Player and one Seeker
-                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 && GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
+                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 || GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
                 {
                     if (timeRemaining > 0)
                     {
@@ -127,8 +129,15 @@ public class GameStateManager : NetworkBehaviour
         for (int i = 0; i < keysTotal; i++)
         {
             GameObject key = Instantiate(keyPrefab);
-            key.transform.position = new Vector3(Random.Range(-376, 455), 12, Random.Range(-162, 286));
+            key.transform.position = new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286));
             GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(key.GetComponent<CompassMarker>());
+        }
+
+        // Spawn crate powerups
+        for (int i = 0; i < 100; i++)
+        {
+            GameObject crate = Instantiate(powerUpPrefab);
+            crate.transform.position = new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286));
         }
 
         // Add a compass marker for each player
@@ -194,8 +203,14 @@ public class GameStateManager : NetworkBehaviour
     {
         Debug.Log("Placing seeker");
         seeker.GetComponent<CharacterController>().enabled = false;
-        seeker.transform.position = new Vector3(Random.Range(-290, 470), 12, Random.Range(30, 120));
+        seeker.transform.position = new Vector3(Random.Range(-290, 470), 16, Random.Range(30, 120));
         seeker.GetComponent<CharacterController>().enabled = true;
+    }
+
+    // Change time
+    [ServerRpc(RequireOwnership = false)]
+    public void ChangeTime(float time) {
+        timeRemaining += time;
     }
 
     // WINNER
