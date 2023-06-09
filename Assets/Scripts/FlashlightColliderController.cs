@@ -5,6 +5,8 @@ using FishNet.Object;
 
 public class FlashlightColliderController : NetworkBehaviour
 {
+    public AudioClip flashlightSfx;
+
     private GameObject playerCamera;
 
     public override void OnStartClient()
@@ -28,7 +30,8 @@ public class FlashlightColliderController : NetworkBehaviour
             Debug.Log("Seeker entered flashlight collider");
             GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlaceSeeker(other.gameObject);
 
-            // PLAY AUDIO TODO
+            // Play sound
+            AudioSource.PlayClipAtPoint(flashlightSfx, transform.position);
         }
     }
 }

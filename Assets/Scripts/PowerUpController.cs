@@ -4,30 +4,53 @@ using UnityEngine;
 
 public class PowerUpController : MonoBehaviour
 {
+    public AudioClip powerUpSfx;
+
+    void Start()
+    {
+        StartCoroutine(EnablePowerUp());
+    }
+
+    IEnumerator EnablePowerUp()
+    {
+        yield return new WaitForSeconds(3f);
+        GetComponent<BoxCollider>().isTrigger = true;
+        GetComponent<Rigidbody>().isKinematic = true;
+    }
+
     void OnTriggerEnter(Collider other)
     {
+
         if (other.gameObject.tag == "Player" || other.gameObject.tag == "Seeker")
         {
             // Pick a random powerup
             int powerUp = Random.Range(1, 4);
+            int buffOrDebuff = Random.Range(0, 1);
 
             if (powerUp == 1)
             {
-                ChangeSpeed(other.gameObject, 5f);
+                float amount = buffOrDebuff == 0 ? 5f : -5f;
+
+                ChangeSpeed(other.gameObject, amount);
             }
             else if (powerUp == 2)
             {
-                ChangeTime(10f);
+                float amount = buffOrDebuff == 0 ? 10f : -10f;
+
+                ChangeTime(amount);
             }
             else if (powerUp == 3)
             {
-                ChangeFog(other.gameObject, 0.08f);
+                float amount = buffOrDebuff == 0 ? 0.08f : -0.08f;
+
+                ChangeFog(other.gameObject, amount);
             }
 
-            Destroy(gameObject);
-        } else if (other.gameObject.CompareTag("Terrain"))
-        {
-            GetComponent<Rigidbody>().isKinematic = true;
+            // Play sound
+            AudioSource.PlayClipAtPoint(powerUpSfx, transform.position);
+
+            // Hide powerup
+            GetComponent<MeshRenderer>().enabled = false;
         }
     }
 
@@ -35,7 +58,6 @@ public class PowerUpController : MonoBehaviour
     {
         if (player.GetComponent<FirstPersonController>().runningSpeed >= 19) return;
 
-        Debug.Log("Changing speed");
         player.GetComponent<FirstPersonController>().walkingSpeed += amount;
         player.GetComponent<FirstPersonController>().runningSpeed += amount;
         StartCoroutine(ResetSpeed(player, amount));
@@ -43,30 +65,29 @@ public class PowerUpController : MonoBehaviour
     IEnumerator ResetSpeed(GameObject player, float amount)
     {
         // Reset speed after 5 seconds
-        Debug.Log("Waiting to reset speed");
         yield return new WaitForSeconds(5f);
-        Debug.Log("Resetting speed");
         player.GetComponent<FirstPersonController>().walkingSpeed -= amount;
         player.GetComponent<FirstPersonController>().runningSpeed -= amount;
+
+        Destroy(gameObject);
     }
 
     void ChangeTime(float amount)
     {
-        Debug.Log("Changing time");
         GameObject.Find("GameStateManager").GetComponent<GameStateManager>().ChangeTime(amount);
+        Destroy(gameObject);
     }
 
     void ChangeFog(GameObject player, float amount)
     {
-        Debug.Log("Changing fog");
         RenderSettings.fogDensity += amount;
         StartCoroutine(ResetFog(player, amount));
     }
     IEnumerator ResetFog(GameObject player, float amount)
     {
-        Debug.Log("Waiting to reset fog");
         yield return new WaitForSeconds(5f);
-        Debug.Log("Resetting fog");
         RenderSettings.fogDensity -= amount;
+        
+        Destroy(gameObject);
     }
 }

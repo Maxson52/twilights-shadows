@@ -16,7 +16,7 @@ public class TurnOffFlashlight : NetworkBehaviour
     void Update()
     {
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player")) {
-            if (Vector3.Distance(transform.position, player.transform.position) < 2f && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
+            if (Vector3.Distance(transform.position, player.transform.position) < 2.5f && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
                 // play shhh audio
                 if (!haveShhed) {
                     AudioSource.PlayClipAtPoint(shhSfx, transform.position);                            
@@ -27,14 +27,19 @@ public class TurnOffFlashlight : NetworkBehaviour
 
                 if (timeToTurnOff < 0) {
                     ServerTurnOffFlashlight();
-                    GameObject.Find("GameStateManager").GetComponent<GameStateManager>().Winner("Seekers win!");
                     timeToTurnOff = 60f;
+                    // wait 0.5 seconds before changing the winner text
+                    Invoke("ChangeWinnerText", 0.5f);
                 }
             } else {
                 timeToTurnOff = 2f;
                 haveShhed = false;
             }
         }
+    }
+
+    void ChangeWinnerText() {
+        GameObject.Find("GameStateManager").GetComponent<GameStateManager>().Winner("Seekers win!");
     }
 
     [ServerRpc(RequireOwnership = false)]

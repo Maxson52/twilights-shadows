@@ -4086,6 +4086,7 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 8213694544720186979}
   _networkObjectCache: {fileID: 8213694544720186979}
+  flashlightSfx: {fileID: 8300000, guid: c63c004f3f033804bbfcdbe18d183742, type: 3}
 --- !u!1 &9060697676225316108
 GameObject:
   m_ObjectHideFlags: 0

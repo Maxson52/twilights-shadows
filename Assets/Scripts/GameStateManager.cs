@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using FishNet;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 
@@ -24,6 +25,7 @@ public class GameStateManager : NetworkBehaviour
 
     [SyncVar]
     private float timeRemaining = 0;
+    [SyncVar]
     private float timeRemainingUntilDisconnect = 5f;
     [SyncVar]
     public string timerText = "Loading...";
@@ -43,15 +45,16 @@ public class GameStateManager : NetworkBehaviour
     {
         base.OnStartServer();
 
-        if (!IsServer)
+        if (base.IsServer)
         {
+            timeRemaining = timeToStart;
+        } else {
             enabled = false;
         }
     }
 
     void Start()
     {
-        timeRemaining = timeToStart;
 
         // change BG music to lobby music
         GameObject.Find("BG Music").GetComponent<AudioSource>().clip = lobbyMusic;
@@ -71,22 +74,22 @@ public class GameStateManager : NetworkBehaviour
 
                 int requiredKeys = keysTotal / 2;
                 
-                timeRemaining -= Time.deltaTime;
+                ChangeTime(-Time.deltaTime);
 
                 if (keysCollected >= requiredKeys)
                 {
-                    timerText = "Time remaining: " + Mathf.Round(timeRemaining) + "\nAll keys collected, report to the building.";
+                    SetTimerText("Time remaining: " + Mathf.Round(timeRemaining) + "\nAll keys collected, report to the building.");
                 } else {
-                    timerText = "Time remaining: " + Mathf.Round(timeRemaining) + "\nKeys collected: " + keysCollected + "/" + requiredKeys;
+                    SetTimerText("Time remaining: " + Mathf.Round(timeRemaining) + "\nKeys collected: " + keysCollected + "/" + requiredKeys);
                 }
             }
             else {
-                Winner("Time's Up. Seekers win!");
+                IsTimeUp();
             }
         }
         else {
             if (winText != "") {
-                timerText = winText;
+                SetTimerText(winText);
                 timeRemainingUntilDisconnect -= Time.deltaTime;
                 if (timeRemainingUntilDisconnect <= 0) {
                     Debug.Log("Disconnecting...");
@@ -99,46 +102,50 @@ public class GameStateManager : NetworkBehaviour
                 {
                     if (timeRemaining > 0)
                     {
-                        timeRemaining -= Time.deltaTime;
-                        timerText = "Starting in: " + Mathf.Round(timeRemaining);
+                        ChangeTime(-Time.deltaTime);
+                        SetTimerText("Starting in: " + Mathf.Round(timeRemaining));
                     }
                     else
                     {
-                        timerText = "Starting now...";
+                        SetTimerText("Starting now...");
+                        ChangeGameState(true);
+                        Debug.Log(gameOn);
                         StartGame();
                     }
                 } else {
-                    timerText = "Waiting for players...";
+                    SetTimerText("Waiting for players...");
                 }
             }
         }
     }
 
-    void StartGame() 
-    {
-        timeRemaining = timeToPlay;
-
+    [ServerRpc(RequireOwnership = false)]
+    void StartGame() {
+        Debug.Log("Starting game..." + gameOn);
+        SetTime(timeToPlay);
         keysTotal = GameObject.FindGameObjectsWithTag("Player").Length * 10;
         keysCollected = 0;
+        // Spawn keys
+        for (int i = 0; i < keysTotal; i++)
+        {
+            SpawnKey();
+        }
 
+        // Spawn crate powerups
+        for (int i = 0; i < 40; i++)
+        {
+            SpawnCrate();
+        }
+        StartGameRpc();
+    }
+
+    [ObserversRpc]
+    void StartGameRpc() 
+    {
         // change BG music to clockmusic
         GameObject.Find("BG Music").GetComponent<AudioSource>().clip = gameMusic;
         GameObject.Find("BG Music").GetComponent<AudioSource>().Play();
         
-        // Spawn keys
-        for (int i = 0; i < keysTotal; i++)
-        {
-            GameObject key = Instantiate(keyPrefab);
-            key.transform.position = new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286));
-            GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(key.GetComponent<CompassMarker>());
-        }
-
-        // Spawn crate powerups
-        for (int i = 0; i < 100; i++)
-        {
-            GameObject crate = Instantiate(powerUpPrefab);
-            crate.transform.position = new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286));
-        }
 
         // Add a compass marker for each player
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
@@ -169,8 +176,6 @@ public class GameStateManager : NetworkBehaviour
             // facing the -x direction
             seeker.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
-
-        gameOn = true;
     }
 
     bool HiderWin() {
@@ -186,8 +191,28 @@ public class GameStateManager : NetworkBehaviour
         return false;
     }
 
-    [ObserversRpc]
+    // Is time up
+    [ServerRpc(RequireOwnership = false)]
+    public void IsTimeUp() {
+        if (timeRemaining <= 0 && gameOn) {
+            Winner("Time's Up. Seekers win!");
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     public void Disconnect() {
+        DisconnectRpc();
+        // reset all variables
+        gameOn = false;
+        timeRemaining = timeToStart;
+        timeRemainingUntilDisconnect = 5;
+        timerText = "";
+        winText = "";
+        keysTotal = 0;
+        keysCollected = 0;
+    }
+    [ObserversRpc]
+    public void DisconnectRpc() {
         GameObject.Find("Main Camera").transform.parent = null;
         ClientManager.StopConnection();
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
@@ -201,10 +226,27 @@ public class GameStateManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void PlaceSeeker(GameObject seeker)
     {
+        PlaceSeekerRpc(seeker);
+    }
+    [ObserversRpc]
+    public void PlaceSeekerRpc(GameObject seeker)
+    {
         Debug.Log("Placing seeker");
         seeker.GetComponent<CharacterController>().enabled = false;
         seeker.transform.position = new Vector3(Random.Range(-290, 470), 16, Random.Range(30, 120));
         seeker.GetComponent<CharacterController>().enabled = true;
+    }
+
+    // Set timer text
+    [ServerRpc(RequireOwnership = false)]
+    public void SetTimerText(string text) {
+        timerText = text;
+    }
+
+    // Set time
+    [ServerRpc(RequireOwnership = false)]
+    public void SetTime(float time) {
+        timeRemaining = time;
     }
 
     // Change time
@@ -213,9 +255,41 @@ public class GameStateManager : NetworkBehaviour
         timeRemaining += time;
     }
 
+    // Change game state
+    [ServerRpc(RequireOwnership = false)]
+    public void ChangeGameState(bool state) {
+        gameOn = state;
+    }
+
+    // Spawn keys
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnKey() {
+        SpawnKeyRpc(new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286)));
+    }
+    [ObserversRpc]
+    public void SpawnKeyRpc(Vector3 location) {
+        GameObject key = Instantiate(keyPrefab);
+        InstanceFinder.ServerManager.Spawn(key, null);
+        key.transform.position = location;
+        GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(key.GetComponent<CompassMarker>());
+    }
+
+    // Spawn crates
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnCrate() {
+        SpawnCrateRpc(new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286)));
+    }
+    [ObserversRpc]
+    public void SpawnCrateRpc(Vector3 location) {
+        GameObject crate = Instantiate(powerUpPrefab);
+        InstanceFinder.ServerManager.Spawn(crate, null);
+        crate.transform.position = location;
+    }
+
     // WINNER
     [ServerRpc(RequireOwnership = false)]
     public void Winner(string winText) {
+        Debug.Log("win");
         gameOn = false;
         this.winText = winText;
     }
