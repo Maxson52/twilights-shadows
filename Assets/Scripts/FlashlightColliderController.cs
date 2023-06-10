@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
+using FishNet.Connection;
 
 public class FlashlightColliderController : NetworkBehaviour
 {
@@ -28,10 +29,20 @@ public class FlashlightColliderController : NetworkBehaviour
         if (other.gameObject.CompareTag("Seeker") && GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn)
         {   
             Debug.Log("Seeker entered flashlight collider");
-            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().PlaceSeeker(other.gameObject);
+            Gotcha(other.gameObject);
 
             // Play sound
             AudioSource.PlayClipAtPoint(flashlightSfx, transform.position);
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void Gotcha(GameObject seeker)
+    {
+        NetworkConnection conn = seeker.GetComponent<NetworkObject>().Owner;
+        Vector3 loc = new Vector3(Random.Range(-270, 490), 16, Random.Range(30, 120));
+        Quaternion rot = Quaternion.Euler(0, Random.Range(-90, 90), 0);
+
+        seeker.GetComponent<FirstPersonController>().TeleportPlayer(conn, loc, rot);
     }
 }

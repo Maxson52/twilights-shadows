@@ -29,6 +29,13 @@ public class PlayerSelection : NetworkBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
+
+        if (GameObject.Find("GameStateManager").GetComponent<GameStateManager>().gameOn) {
+            // show Error and disabled the Buttons
+            canvas.transform.Find("Error").gameObject.SetActive(true);
+            canvas.transform.Find("Hider").gameObject.SetActive(false);
+            canvas.transform.Find("Seeker").gameObject.SetActive(false);
+        }
     }
 
     public void SpawnHider() {

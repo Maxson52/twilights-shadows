@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Object;
 
-public class PowerUpController : MonoBehaviour
+public class PowerUpController : NetworkBehaviour
 {
     public AudioClip powerUpSfx;
 
@@ -66,16 +67,17 @@ public class PowerUpController : MonoBehaviour
     {
         // Reset speed after 5 seconds
         yield return new WaitForSeconds(5f);
+        Debug.Log("Resetting speed " + amount);
         player.GetComponent<FirstPersonController>().walkingSpeed -= amount;
         player.GetComponent<FirstPersonController>().runningSpeed -= amount;
 
-        Destroy(gameObject);
+        DestroyPowerUpServerRpc();
     }
 
     void ChangeTime(float amount)
     {
         GameObject.Find("GameStateManager").GetComponent<GameStateManager>().ChangeTime(amount);
-        Destroy(gameObject);
+        DestroyPowerUpServerRpc();
     }
 
     void ChangeFog(GameObject player, float amount)
@@ -86,8 +88,20 @@ public class PowerUpController : MonoBehaviour
     IEnumerator ResetFog(GameObject player, float amount)
     {
         yield return new WaitForSeconds(5f);
+        Debug.Log("Resetting fog " + amount);
         RenderSettings.fogDensity -= amount;
         
+        DestroyPowerUpServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void DestroyPowerUpServerRpc()
+    {
+        DestroyPowerUpObserversRpc();
+    }
+    [ObserversRpc]
+    public void DestroyPowerUpObserversRpc()
+    {
         Destroy(gameObject);
     }
 }

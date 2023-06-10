@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using FishNet;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 
@@ -85,7 +86,7 @@ public class GameStateManager : NetworkBehaviour
                 }
             }
             else {
-                IsTimeUp();
+                Winner("Time's Up. Seekers win!", true);
             }
         }
         else {
@@ -99,7 +100,7 @@ public class GameStateManager : NetworkBehaviour
 
             } else {
                 // Only start if there is at least one object with tag Player and one Seeker
-                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 || GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
+                if (GameObject.FindGameObjectsWithTag("Player").Length > 0 && GameObject.FindGameObjectsWithTag("Seeker").Length > 0)
                 {
                     if (timeRemaining > 0)
                     {
@@ -108,7 +109,6 @@ public class GameStateManager : NetworkBehaviour
                     }
                     else
                     {
-                        Debug.Log(gameOn);
                         StartGame();
                     }
                 } else {
@@ -146,21 +146,21 @@ public class GameStateManager : NetworkBehaviour
         // Place players randomly between z = 30 and z = 120 (x is -290 and y = 12)
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
-            player.GetComponent<CharacterController>().enabled = false;
-            player.transform.position = new Vector3(-290, 12, Random.Range(30, 120));
-            player.GetComponent<CharacterController>().enabled = true;
-            // facing the +x direction
-            player.transform.rotation = Quaternion.Euler(0, 90, 0);
+            NetworkConnection conn = player.GetComponent<NetworkObject>().Owner;
+            Vector3 loc = new Vector3(-290, 12, Random.Range(30, 120));
+            Quaternion rot = Quaternion.Euler(0, 90, 0);
+
+            player.GetComponent<FirstPersonController>().TeleportPlayer(conn, loc, rot);
        }
 
         // Place seekers randomly between z = 30 and z = 120 (x is 470 and y = 12)
         foreach (GameObject seeker in GameObject.FindGameObjectsWithTag("Seeker"))
         {
-            seeker.GetComponent<CharacterController>().enabled = false;
-            seeker.transform.position = new Vector3(470, 12, Random.Range(30, 120));
-            seeker.GetComponent<CharacterController>().enabled = true;
-            // facing the -x direction
-            seeker.transform.rotation = Quaternion.Euler(0, -90, 0);
+            NetworkConnection conn = seeker.GetComponent<NetworkObject>().Owner;
+            Vector3 loc = new Vector3(470, 12, Random.Range(30, 120));
+            Quaternion rot = Quaternion.Euler(0, -90, 0);
+
+            seeker.GetComponent<FirstPersonController>().TeleportPlayer(conn, loc, rot);
         }
 
         StartGameRpc();
@@ -188,6 +188,8 @@ public class GameStateManager : NetworkBehaviour
         // Add a compass marker for the building
         GameObject building = GameObject.Find("Building");
         GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(building.GetComponent<CompassMarker>());
+
+        
     }
 
     // Check if hiders win
@@ -202,14 +204,6 @@ public class GameStateManager : NetworkBehaviour
         }
 
         return false;
-    }
-
-    // Is time up
-    [ServerRpc(RequireOwnership = false)]
-    public void IsTimeUp() {
-        if (timeRemaining <= 0 && gameOn) {
-            Winner("Time's Up. Seekers win!");
-        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -244,20 +238,6 @@ public class GameStateManager : NetworkBehaviour
         Destroy(key);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void PlaceSeeker(GameObject seeker)
-    {
-        PlaceSeekerRpc(seeker);
-        seeker.GetComponent<CharacterController>().enabled = false;
-        seeker.transform.position = new Vector3(Random.Range(-290, 470), 16, Random.Range(30, 120));
-        seeker.GetComponent<CharacterController>().enabled = true;
-    }
-    [ObserversRpc]
-    public void PlaceSeekerRpc(GameObject seeker)
-    {
-        Debug.Log("Placing seeker");
-    }
-
     // Set timer text
     [ServerRpc(RequireOwnership = false)]
     public void SetTimerText(string text) {
@@ -278,8 +258,10 @@ public class GameStateManager : NetworkBehaviour
 
     // WINNER
     [ServerRpc(RequireOwnership = false)]
-    public void Winner(string winText) {
-        Debug.Log("win");
+    public void Winner(string winText, bool doIHaveToCheckIfTheTimeIsActuallyUpWhenItMightNotBeForSomeReason = false) {        
+        Debug.Log("Winner " + doIHaveToCheckIfTheTimeIsActuallyUpWhenItMightNotBeForSomeReason + " gameon: " + gameOn + " time left: " + timeRemaining);
+        if (doIHaveToCheckIfTheTimeIsActuallyUpWhenItMightNotBeForSomeReason && (!gameOn && timeRemaining > 0)) return;
+
         gameOn = false;
         this.winText = winText;
     }

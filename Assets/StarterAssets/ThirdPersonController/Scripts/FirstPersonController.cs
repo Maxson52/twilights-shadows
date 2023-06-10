@@ -303,6 +303,17 @@ public class FirstPersonController : NetworkBehaviour
         _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
     }
 
+    // Apparently I have to do this in here
+    [TargetRpc]
+    public void TeleportPlayer(NetworkConnection conn, Vector3 location, Quaternion rotation)
+    {
+
+        GetComponent<CharacterController>().enabled = false;
+        transform.position = location;
+        transform.rotation = rotation;
+        GetComponent<CharacterController>().enabled = true;
+    }
+
     // Server RPCs
     [ServerRpc]
     public void ServerPlayFootstepAudio(Vector3 center, int index)
