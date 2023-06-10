@@ -6,6 +6,18 @@ public class KeyController : MonoBehaviour
 {
     public AudioClip KeyCollectAudioClip;
 
+    void Start()
+    {
+        StartCoroutine(EnablePowerUp());
+    }
+
+    IEnumerator EnablePowerUp()
+    {
+        yield return new WaitForSeconds(3f);
+        GetComponent<BoxCollider>().isTrigger = true;
+        GetComponent<Rigidbody>().isKinematic = true;
+    }
+
     void Update()
     {
         transform.Rotate(new Vector3(0, 45, 0) * Time.deltaTime);
@@ -16,17 +28,8 @@ public class KeyController : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             // Add key function
-            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().KeyCollected();
-
+            GameObject.Find("GameStateManager").GetComponent<GameStateManager>().KeyCollected(gameObject);
             AudioSource.PlayClipAtPoint(KeyCollectAudioClip, transform.position);
-
-            // Remove from compass UI
-            GameObject.Find("Compass").GetComponent<CompassHandler>().RemoveMarker(gameObject);
-
-            Destroy(gameObject);
-        } else if (other.gameObject.CompareTag("Terrain")) 
-        {
-            GetComponent<Rigidbody>().isKinematic = true;
         }
     }
 }

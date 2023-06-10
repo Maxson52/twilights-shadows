@@ -50,6 +50,7 @@ public class GameStateManager : NetworkBehaviour
             timeRemaining = timeToStart;
         } else {
             enabled = false;
+            Destroy(gameObject);
         }
     }
 
@@ -107,8 +108,6 @@ public class GameStateManager : NetworkBehaviour
                     }
                     else
                     {
-                        SetTimerText("Starting now...");
-                        ChangeGameState(true);
                         Debug.Log(gameOn);
                         StartGame();
                     }
@@ -121,41 +120,28 @@ public class GameStateManager : NetworkBehaviour
 
     [ServerRpc(RequireOwnership = false)]
     void StartGame() {
-        Debug.Log("Starting game..." + gameOn);
-        SetTime(timeToPlay);
+        if (gameOn) return;
+
+        timerText = "Starting game...";
+        timeRemaining = timeToPlay;
+        gameOn = true;
         keysTotal = GameObject.FindGameObjectsWithTag("Player").Length * 10;
         keysCollected = 0;
         // Spawn keys
         for (int i = 0; i < keysTotal; i++)
         {
-            SpawnKey();
+            GameObject key = Instantiate(keyPrefab);
+            InstanceFinder.ServerManager.Spawn(key, null);
+            key.transform.position = new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286));
         }
 
         // Spawn crate powerups
         for (int i = 0; i < 40; i++)
         {
-            SpawnCrate();
+            GameObject crate = Instantiate(powerUpPrefab);
+            InstanceFinder.ServerManager.Spawn(crate, null);
+            crate.transform.position = new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286));
         }
-        StartGameRpc();
-    }
-
-    [ObserversRpc]
-    void StartGameRpc() 
-    {
-        // change BG music to clockmusic
-        GameObject.Find("BG Music").GetComponent<AudioSource>().clip = gameMusic;
-        GameObject.Find("BG Music").GetComponent<AudioSource>().Play();
-        
-
-        // Add a compass marker for each player
-        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
-        {
-            GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(player.GetComponent<CompassMarker>());
-        }
-
-        // Add a compass marker for the building
-        GameObject building = GameObject.Find("Building");
-        GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(building.GetComponent<CompassMarker>());
 
         // Place players randomly between z = 30 and z = 120 (x is -290 and y = 12)
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
@@ -176,8 +162,35 @@ public class GameStateManager : NetworkBehaviour
             // facing the -x direction
             seeker.transform.rotation = Quaternion.Euler(0, -90, 0);
         }
+
+        StartGameRpc();
     }
 
+    [ObserversRpc]
+    void StartGameRpc() 
+    {
+        // change BG music to clockmusic
+        GameObject.Find("BG Music").GetComponent<AudioSource>().clip = gameMusic;
+        GameObject.Find("BG Music").GetComponent<AudioSource>().Play();
+
+        // Add a compass marker for each player
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(player.GetComponent<CompassMarker>());
+        }
+
+        // Add a compass marker for each key
+        foreach (GameObject key in GameObject.FindGameObjectsWithTag("Key"))
+        {
+            GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(key.GetComponent<CompassMarker>());
+        }
+
+        // Add a compass marker for the building
+        GameObject building = GameObject.Find("Building");
+        GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(building.GetComponent<CompassMarker>());
+    }
+
+    // Check if hiders win
     bool HiderWin() {
         if (keysCollected >= keysTotal / 2) {
             foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
@@ -218,23 +231,31 @@ public class GameStateManager : NetworkBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
     }
 
+    // When key is collected
     [ServerRpc(RequireOwnership = false)]
-    public void KeyCollected() {
+    public void KeyCollected(GameObject key) {
         keysCollected++;
+        KeyCollectedRpc(key);
+    }
+    [ObserversRpc]
+    public void KeyCollectedRpc(GameObject key) {        
+        // Remove from compass UI
+        GameObject.Find("Compass").GetComponent<CompassHandler>().RemoveMarker(key);
+        Destroy(key);
     }
 
     [ServerRpc(RequireOwnership = false)]
     public void PlaceSeeker(GameObject seeker)
     {
         PlaceSeekerRpc(seeker);
+        seeker.GetComponent<CharacterController>().enabled = false;
+        seeker.transform.position = new Vector3(Random.Range(-290, 470), 16, Random.Range(30, 120));
+        seeker.GetComponent<CharacterController>().enabled = true;
     }
     [ObserversRpc]
     public void PlaceSeekerRpc(GameObject seeker)
     {
         Debug.Log("Placing seeker");
-        seeker.GetComponent<CharacterController>().enabled = false;
-        seeker.transform.position = new Vector3(Random.Range(-290, 470), 16, Random.Range(30, 120));
-        seeker.GetComponent<CharacterController>().enabled = true;
     }
 
     // Set timer text
@@ -253,37 +274,6 @@ public class GameStateManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void ChangeTime(float time) {
         timeRemaining += time;
-    }
-
-    // Change game state
-    [ServerRpc(RequireOwnership = false)]
-    public void ChangeGameState(bool state) {
-        gameOn = state;
-    }
-
-    // Spawn keys
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnKey() {
-        SpawnKeyRpc(new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286)));
-    }
-    [ObserversRpc]
-    public void SpawnKeyRpc(Vector3 location) {
-        GameObject key = Instantiate(keyPrefab);
-        InstanceFinder.ServerManager.Spawn(key, null);
-        key.transform.position = location;
-        GameObject.Find("Compass").GetComponent<CompassHandler>().AddMarker(key.GetComponent<CompassMarker>());
-    }
-
-    // Spawn crates
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnCrate() {
-        SpawnCrateRpc(new Vector3(Random.Range(-376, 455), 16, Random.Range(-162, 286)));
-    }
-    [ObserversRpc]
-    public void SpawnCrateRpc(Vector3 location) {
-        GameObject crate = Instantiate(powerUpPrefab);
-        InstanceFinder.ServerManager.Spawn(crate, null);
-        crate.transform.position = location;
     }
 
     // WINNER
