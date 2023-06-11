@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using FishNet.Object;
 using FishNet.Connection;
 
@@ -8,6 +9,9 @@ public class PlayerSelection : NetworkBehaviour
 {
     [SerializeField] private GameObject canvas;
     [SerializeField] private List<GameObject> playerPrefabs = new List<GameObject>();
+
+    [SerializeField] private TextMeshProUGUI keyMaster;
+    [SerializeField] private TextMeshProUGUI hunter;
 
     public override void OnStartClient() {
         base.OnStartClient();
@@ -36,6 +40,14 @@ public class PlayerSelection : NetworkBehaviour
             canvas.transform.Find("Hider").gameObject.SetActive(false);
             canvas.transform.Find("Seeker").gameObject.SetActive(false);
         }
+
+        // get number of Players
+        int numberOfPlayers = GameObject.FindGameObjectsWithTag("Player").Length;
+        int numberOfSeekers = GameObject.FindGameObjectsWithTag("Seeker").Length;
+
+        // make buttons include number of players
+        keyMaster.text = "Key Master (" + numberOfPlayers + ")";
+        hunter.text = "Hunter (" + numberOfSeekers + ")";
     }
 
     public void SpawnHider() {

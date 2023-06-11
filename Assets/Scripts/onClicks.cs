@@ -44,7 +44,12 @@ namespace FishNet.Discovery
         }
 
         public void StartSearching() {
-            if (networkDiscovery.IsSearching) return;
+            if (networkDiscovery.IsSearching) {
+                networkDiscovery.StopSearchingForServers();
+                CancelInvoke("UpdateDots");
+                StartSearch.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Join Lobby";
+                return;
+            };
             FindObjectOfType<NetworkDiscovery>().StartSearchingForServers();
 
             // Set TMP text to Searching... and update the dots every second
@@ -58,6 +63,12 @@ namespace FishNet.Discovery
             } else {
                 StartSearch.GetComponentInChildren<TMPro.TextMeshProUGUI>().text += ".";
             }
+        }
+
+        public void Quit() {
+            Debug.Log("Quit");
+            Application.Quit();
+            Debug.Log("Quit...");
         }
     }
 }

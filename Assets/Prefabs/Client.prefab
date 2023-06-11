@@ -323,8 +323,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -80, y: 78}
-  m_SizeDelta: {x: 160, y: 50}
+  m_AnchoredPosition: {x: -100, y: 78}
+  m_SizeDelta: {x: 180, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6708467942703247341
 CanvasRenderer:
@@ -833,8 +833,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 80, y: 78}
-  m_SizeDelta: {x: 160, y: 50}
+  m_AnchoredPosition: {x: 100, y: 78}
+  m_SizeDelta: {x: 180, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6708467943920818114
 CanvasRenderer:
@@ -1014,6 +1014,8 @@ MonoBehaviour:
   playerPrefabs:
   - {fileID: 5088322876150215219, guid: 15b7fe77772121f49bae4cee3be034a9, type: 3}
   - {fileID: 2817051994157138043, guid: 560007d9bdc3de44198397d117ec4a5d, type: 3}
+  keyMaster: {fileID: 6708467943734700431}
+  hunter: {fileID: 6708467943109176659}
 --- !u!1 &6708467944452450262
 GameObject:
   m_ObjectHideFlags: 0
